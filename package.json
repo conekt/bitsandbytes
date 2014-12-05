@@ -1,0 +1,54 @@
+{
+  "name": "bitsandbytes",
+  "version": "1.0.0",
+  "description": "Its just a Bits and Bytes processing tool which helps user to decode any binary or stream messages with the support of specification(User Manual). More focused on future compatability to handle smart device messages.",
+  "main": "bitsandbytes.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/conekt/bitsandbytes"
+  },
+  "keywords": [
+    "iot",
+    "m2m",
+    "decode",
+    "machine-language",
+    "decoder",
+    "binary",
+    "buffer",
+    "protocol",
+    "frame",
+    "packet",
+    "stream",
+    "gateway",
+    "bits",
+    "bytes",
+    "specification",
+    "spec",
+    "data",
+    "smart-device",
+    "modbus",
+    "tcp",
+    "server",
+    "mqtt",
+    "manual",
+    "masking",
+    "mask",
+    "report-mask",
+    "reportmasking",
+    "bitmasking"
+  ],
+  "author": "Conekt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/conekt/bitsandbytes/issues"
+  },
+  "homepage": "https://github.com/conekt/bitsandbytes",
+  "dependencies": {
+    "async": "^0.9.0",
+    "bit-buffer": "0.0.3",
+    "underscore": "^1.7.0"
+  }
+}
