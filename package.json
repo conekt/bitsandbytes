@@ -1,6 +1,6 @@
 {
   "name": "bitsandbytes",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Its just a Bits and Bytes processing tool which helps user to decode any binary or stream messages with the support of specification(User Manual). More focused on future compatability to handle smart device messages.",
   "main": "bitsandbytes.js",
   "scripts": {

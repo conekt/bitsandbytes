@@ -1,8 +1,11 @@
 
 
 /*Common Modules*/
+//require('buffertools');
 var async = require('async');
 var _ = require('underscore');
+var bitBuffer = require('bit-buffer');
+var BitView = bitBuffer.BitView;
 
 
 var FieldDecoder = require('./lib/decoder');
@@ -27,6 +30,11 @@ TwinkleBits.prototype.decode =function(buffer, spec, cb){
     if (!(spec)) {
         !cbFlag && (cbFlag = true) && process.nextTick(function(){cb("INVALID_MESSAGE_SPECIFICATION", null)});
         return null;
+    }
+
+    if(spec.meta && spec.meta.multiPacketsData  ){
+        that.messagePacketDecode(buffer, spec, cb);
+        return;
     }
 
 
@@ -133,9 +141,6 @@ TwinkleBits.prototype.decodeMessageTypes =function(reqObject, cb){
 
 TwinkleBits.prototype.decodeFields = function(reqObject, cb){
 
-
-
-
     var that = this;
     var spec = reqObject.spec;
     var buffer = reqObject.buffer;
@@ -204,7 +209,215 @@ TwinkleBits.prototype.decodeFields = function(reqObject, cb){
 };
 
 
+TwinkleBits.prototype.messagePacketDecode = function(buffer, spec, cb){
+
+    var that = this;
+    var respData = [];
+
+    var headCursor = 0;
+
+    if(spec.headers){
+
+
+        var headerDataLength = that.getTotalFieldsLength(buffer,spec.headers);
+        var messageLengthField = _.findWhere(spec.headers, { messageLengthField : true });
+
+
+        async.whilst(
+            function () {
+                return (headCursor < buffer.length) ; },
+            function (dataProcessCB) {
+
+
+                var headerObj = null;
+
+                async.series({
+                    header : function(selfCB){
+                        headerObj = null;
+                        var _specTemp = {bigEndian : spec.bigEndian, fields : spec.headers };
+
+                        that.decode(buffer.slice(headCursor,headCursor+headerDataLength), _specTemp, function(err, data){
+
+                            headerObj = data;
+                            process.nextTick(function(){selfCB(err, data);});
+
+
+                        })
+
+                        headCursor+=headerDataLength;
+                    },
+                    message : function(selfCB){
+
+                        var messageLength = null;
+                        if(messageLengthField && messageLengthField.length > 0){
+                            messageLength = headerObj[messageLengthField.name] * 1
+                        }else{
+                            messageLength = spec.meta.messageLength;
+                        }
+
+
+                        if(spec.messageTypes){
+                            var messageTypeField = _.findWhere(spec.headers, { messageType : true });
+
+
+
+                            var _specTemp = {bigEndian : spec.bigEndian, fields : spec.messageTypes[headerObj[messageTypeField.name]] };
+
+
+
+                            that.decode(buffer.slice(headCursor,headCursor+messageLength), _specTemp, function(err, data){
+
+//                                console.log(err, data);
+                               // headerObj = data;
+                                process.nextTick(function(){selfCB(err, data);});
+
+
+                            })
+
+                            headCursor+=messageLength;
+
+
+                        }else{
+
+                            var _specTemp = {bigEndian : spec.bigEndian, fields : spec.fields };
+
+//                            console.log("MESSAGE : ",headCursor,' ** ',headCursor+messageLength,buffer.slice(headCursor,headCursor+messageLength),'\n\n>>>>>>>>');
+
+
+//                            console.log("MESSAGE SPEC : ", _specTemp,'\n\n>>>>>>>>')
+                            that.decode(buffer.slice(headCursor,headCursor+messageLength), _specTemp, function(err, data){
+
+//                                console.log(err, data);
+                                // headerObj = data;
+                                process.nextTick(function(){selfCB(err, data);});
+
+
+                            })
+
+                            headCursor+=messageLength;
+
+
+                        }
+
+
+
+
+
+                    }
+                },function(err, _decodedData){
+//                    console.log("Decoded Data....",_decodedData)
+                    respData.push(_decodedData);
+//                    !err && (console.log("Current Length :   ",respData.push[_decodedData]))
+
+//                    console.log(err, _decodedData)
+//                    console.log(respData);
+//                    console.log("=================================================================")
+
+
+                    dataProcessCB(err);
+                })
+
+
+
+
+
+
+
+
+
+
+//                    headCursor = buffer.length //TODO REMOVE THIS
+////                    console.log(buffer.slice(headCursor,(headCursor+=messageLength)));
+//                    dataProcessCB(null);
+
+
+            },
+            function (err) {
+                if(!(headCursor === buffer.length)){
+                    console.log("MESSAGE LENGTH INVALID...")
+                }
+//                console.log("RESPONSE DATA ::: ",respData);
+                cb(err, respData);
+                // 5 seconds have passed
+            }
+        );
+    }else{
+        console.log("INVALID MESSAGE....")
+
+
+        var headerDataLength = that.getTotalFieldsLength(buffer,spec.headers);
+        var messageLengthField = _.findWhere(spec.headers, { messageLengthField : true });
+        console.log(messageLengthField);
+    }
+
+
+
+};
+
+
+/*Async Decoder for Each Field*/
+TwinkleBits.prototype.decodeBEAsync = function(buffer, field, cb){
+
+    var spec = {  bigEndian : true, fields : _.isArray(field) ? field : [field]  }
+
+    this.decode(buffer, spec, function(err, data){
+        if(err){
+            cb(err, null)
+            return;
+        }
+
+        console.log("Data : ",data[_.keys(data)[0]])
+        cb(err, data[_.keys(data)[0]])
+    })
+}
+
+TwinkleBits.prototype.decodeLEAsync = function(buffer, field, cb){
+
+//    var spec = {  bigEndian : false, fields : _.isArray(field) ? field : [field]  }
+//
+//    this.decode(buffer, spec, function(err, data){
+//        if(err){
+//            cb(err, null)
+//            return;
+//        }
+//
+//        cb(err, data[_.keys(data)[0]])
+//    })
+    var decodeFun = this.fieldDecoder.decodeFieldLE;
+    console.log(decodeFun(buffer, field));
+
+};
+
+
+TwinkleBits.prototype.decodeBE = function(buffer, field, cb){
+    var decodeFun = this.fieldDecoder.decodeFieldBE;
+    return decodeFun(buffer, field)
+}
+
+TwinkleBits.prototype.decodeLE = function(buffer, field, cb){
+    var decodeFun = this.fieldDecoder.decodeFieldLE;
+    return decodeFun(buffer, field);
+}
+
+TwinkleBits.prototype.getTotalFieldsLength = function(buffer,fields){
+
+    var length = 0;
+
+    _.each(fields, function(field){
+
+        if(field.type=='size'){
+            length += buffer.length;
+            return;
+        }
+        length += getFieldLength(field);
+    })
+    return length;
+
+};
+
+
 var getFieldLength = function(fieldSpec){
+
     switch (fieldSpec.type) {
         case 'int8':
         case 'uint8':
@@ -223,9 +436,11 @@ var getFieldLength = function(fieldSpec){
         case 'byte':
             return fieldSpec.length;
     }
+
 };
 
 
 module.exports =  TwinkleBits;
+
 
 
