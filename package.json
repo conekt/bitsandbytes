@@ -1,7 +1,7 @@
 {
   "name": "bitsandbytes",
-  "version": "1.0.1",
-  "description": "Its just a Bits and Bytes processing tool which helps user to decode any binary or stream messages with the support of specification(User Manual). More focused on future compatability to handle smart device messages.",
+  "version": "1.0.2",
+  "description": "A simple and light weight framework to decode binary or stream messages.",
   "main": "bitsandbytes.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

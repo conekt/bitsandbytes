@@ -1,12 +1,10 @@
 #BITS and BYTES#
 A simple and light weight framework to decode binary or stream messages.
+>
 > npm install bitsandbytes
+>
 
 -----------------------
-
-
-> **Note:**
->  It will supports more complex decoding formats in a simple way. Detailed documentation will be provided soon. 
 
 
 
@@ -60,4 +58,10 @@ console.log(decoder.decodeLE(bufferStreams,{type : 'byte',start :0, length : 4 }
 console.log(decoder.decodeLE(bufferStreams,{type : 'bit',start :0, length : 1, bitStart : 0, bitLength:3, signed:false }));
 
 ```
+
+
+
+
+> **Note:**
+>  It will supports more complex decoding formats in a simple way. Detailed documentation will be provided soon.
 
