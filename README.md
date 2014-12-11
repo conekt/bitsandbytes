@@ -5,9 +5,33 @@ A simple and light weight framework to decode binary or stream messages.
 >
 
 -----------------------
+Bit Operations
+--------------
+
+```
+var BitsAndBytes = require('bitsandbytes');
+var decoder = new BitsAndBytes();
+
+var msg = '4564654654657894916574879836';
+var bufferStreams = new Buffer(msg,'hex');
+
+//Big Endian
+console.log("Bit : ",
+decoder.decodeBE(bufferStreams,{type : 'bit',start :0 , length : 1, bitStart : 0, bitLength:3, signed:false }));
+
+//Little Endian
+console.log("Bit : ",
+decoder.decodeLE(bufferStreams,{type : 'bit',start :0 , length : 1, bitStart : 0, bitLength:3, signed:false }));
+
+\\start (Byte Start Position)
+\\length (No of Bytes to consider)
+\\bitStart (Start of bit position)
+\\bitLength (No of bits to consider)
+
+```
 
 
-
+###Byte Operations###
 
 Big-Endian
 ------------
@@ -20,10 +44,10 @@ var bufferStreams = new Buffer(msg,'hex');
 
 console.log("8 Bit Integer : ",decoder.decodeBE(bufferStreams,{type : 'int8', start:0 }));
 console.log("8 Bit Unsigned Integer",decoder.decodeBE(bufferStreams,{type : 'uint8', start:0 }));
-console.log("8 Bit Integer : ",decoder.decodeBE(bufferStreams,{type : 'int16', start:0 }));
-console.log("8 Bit Integer : ",decoder.decodeBE(bufferStreams,{type : 'uint16', start:0 }));
-console.log("8 Bit Integer : ",decoder.decodeBE(bufferStreams,{type : 'int32', start:0 }));
-console.log("8 Bit Integer : ",decoder.decodeBE(bufferStreams,{type : 'uint32', start:0 }));
+console.log("16 Bit Integer : ",decoder.decodeBE(bufferStreams,{type : 'int16', start:0 }));
+console.log("16 Bit Unsigned Integer : ",decoder.decodeBE(bufferStreams,{type : 'uint16', start:0 }));
+console.log("32 Bit Integer : ",decoder.decodeBE(bufferStreams,{type : 'int32', start:0 }));
+console.log("32 Bit Unsigned Integer : ",decoder.decodeBE(bufferStreams,{type : 'uint32', start:0 }));
 
 console.log("Float : ",decoder.decodeBE(bufferStreams,{type : 'float', start:0 }));
 console.log("Double : ",decoder.decodeBE(bufferStreams,{type : 'double', start:0 }));
@@ -56,10 +80,10 @@ var bufferStreams = new Buffer(msg,'hex');
 
 console.log("8 Bit Integer : ",decoder.decodeLE(bufferStreams,{type : 'int8', start:0 }));
 console.log("8 Bit Unsigned Integer",decoder.decodeLE(bufferStreams,{type : 'uint8', start:0 }));
-console.log("8 Bit Integer : ",decoder.decodeLE(bufferStreams,{type : 'int16', start:0 }));
-console.log("8 Bit Integer : ",decoder.decodeLE(bufferStreams,{type : 'uint16', start:0 }));
-console.log("8 Bit Integer : ",decoder.decodeLE(bufferStreams,{type : 'int32', start:0 }));
-console.log("8 Bit Integer : ",decoder.decodeLE(bufferStreams,{type : 'uint32', start:0 }));
+console.log("16 Bit Integer : ",decoder.decodeLE(bufferStreams,{type : 'int16', start:0 }));
+console.log("16 Bit Unsigned Integer : ",decoder.decodeLE(bufferStreams,{type : 'uint16', start:0 }));
+console.log("32 Bit Integer : ",decoder.decodeLE(bufferStreams,{type : 'int32', start:0 }));
+console.log("32 Bit Unsigned Integer : ",decoder.decodeLE(bufferStreams,{type : 'uint32', start:0 }));
 
 console.log("Float : ",decoder.decodeLE(bufferStreams,{type : 'float', start:0 }));
 console.log("Double : ",decoder.decodeLE(bufferStreams,{type : 'double', start:0 }));
