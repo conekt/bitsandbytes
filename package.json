@@ -1,6 +1,6 @@
 {
   "name": "bitsandbytes",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A simple and light weight framework to decode binary or stream messages.",
   "main": "bitsandbytes.js",
   "scripts": {
